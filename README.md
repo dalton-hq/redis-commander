@@ -2,6 +2,12 @@
 
 Redis web management tool written in node.js
 
+## Dalton-maintained fork
+
+This fork keeps the upstream MIT License and publishes Dalton-maintained container images from `dalton-hq/redis-commander`.
+
+See [NOTICE.md](./NOTICE.md) for attribution and license notes.
+
 ![GUI image](./docs/GUI_EXAMPLE.png)
 
 # Install and Run
