@@ -5,4 +5,14 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-      day: "wednesday"
+      day: "sunday"
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "sunday"

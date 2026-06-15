@@ -1,0 +1,35 @@
+---
+name: Image security
+
+on:
+  pull_request:
+  push:
+    branches-ignore:
+      - master
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  build_scan:
+    name: Build and scan image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build local image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          load: true
+          platforms: linux/amd64
+          tags: redis-commander:ci
+
+      - name: Scan image for fixable critical vulnerabilities
+        run: |
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:0.71.1 image --severity CRITICAL --ignore-unfixed --exit-code 1 redis-commander:ci

@@ -26,7 +26,6 @@ on:
 env:
   GITHUB_REG: ghcr.io
   GITHUB_REPO: ${{ github.repository }}
-  DOCKERHUB_IMAGE: rediscommander/redis-commander
 
 defaults:
   run:
@@ -46,7 +45,7 @@ permissions:
 jobs:
   build_publish:
     name: Build image and push
-    if: github.repository == 'joeferner/redis-commander'
+    if: github.repository == 'dalton-hq/redis-commander'
     runs-on: ubuntu-latest
 
     steps:
@@ -88,10 +87,9 @@ jobs:
         env:
           GITHUB_IMAGE: ${{ env.GITHUB_REG }}/${{ env.GITHUB_REPO }}
         run: |
-          VERSION=latest
-          # first ghcr.io, second dockerhub
-          TAGS="${GITHUB_IMAGE}:${VERSION}"
-          #TAGS="$TAGS,${DOCKERHUB_IMAGE}:${VERSION}"
+          APP_VERSION="$(node -p 'require("./package.json").version')"
+          SHORT_SHA="${GITHUB_SHA::12}"
+          TAGS="${GITHUB_IMAGE}:latest,${GITHUB_IMAGE}:${APP_VERSION}.${GITHUB_RUN_NUMBER},${GITHUB_IMAGE}:sha-${SHORT_SHA}"
 
           # If this is git tag, use the tag name as a docker tag too
           if [[ $GITHUB_REF == refs/tags/v* ]]; then
@@ -100,20 +98,31 @@ jobs:
             VERSION_MAJOR=${VERSION%%.*}
             # also tag with version numbers additionally to "latest"
             TAGS="$TAGS,${GITHUB_IMAGE}:${VERSION},${GITHUB_IMAGE}:${VERSION_MINOR},${GITHUB_IMAGE}:${VERSION_MAJOR}"
-            #TAGS="$TAGS,${DOCKERHUB_IMAGE}:${VERSION},${DOCKERHUB_IMAGE}:${VERSION_MINOR},${DOCKERHUB_IMAGE}:${VERSION_MAJOR}"
           fi
 
           # Set output parameters.
           echo "tags=${TAGS}" >> $GITHUB_OUTPUT
-          echo "docker_image=${DOCKERHUB_IMAGE}" >> $GITHUB_OUTPUT
+          echo "scan_image=${GITHUB_IMAGE}:scan-${SHORT_SHA}" >> $GITHUB_OUTPUT
 
 
       - name: Show docker image tags to build
         run: |
-          echo "Docker image: ${{ steps.prep.outputs.docker_image }}"
           echo "Image tags:  ${{ steps.prep.outputs.tags }}"
 
-      - name: Docker build and push to GHCR and Dockerhub for prepared tags
+      - name: Build local image for vulnerability scan
+        uses: docker/build-push-action@v6
+        with:
+          builder: ${{ steps.buildx.outputs.name }}
+          context: .
+          load: true
+          platforms: linux/amd64
+          tags: ${{ steps.prep.outputs.scan_image }}
+
+      - name: Scan local image for fixable critical vulnerabilities
+        run: |
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:0.71.1 image --severity CRITICAL --ignore-unfixed --exit-code 1 "${{ steps.prep.outputs.scan_image }}"
+
+      - name: Docker build and push to GHCR
         uses: docker/build-push-action@v6
         with:
           builder: ${{ steps.buildx.outputs.name }}
