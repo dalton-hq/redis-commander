@@ -87,9 +87,8 @@ jobs:
         env:
           GITHUB_IMAGE: ${{ env.GITHUB_REG }}/${{ env.GITHUB_REPO }}
         run: |
-          APP_VERSION="$(node -p 'require("./package.json").version')"
           SHORT_SHA="${GITHUB_SHA::12}"
-          TAGS="${GITHUB_IMAGE}:latest,${GITHUB_IMAGE}:${APP_VERSION}-dalton.${GITHUB_RUN_NUMBER},${GITHUB_IMAGE}:sha-${SHORT_SHA}"
+          TAGS="${GITHUB_IMAGE}:latest,${GITHUB_IMAGE}:sha-${SHORT_SHA}"
 
           # If this is git tag, use the tag name as a docker tag too
           if [[ $GITHUB_REF == refs/tags/v* ]]; then
