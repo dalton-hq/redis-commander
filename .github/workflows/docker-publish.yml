@@ -2,9 +2,6 @@
 name: Docker publish
 
 on:
-  workflow_dispatch:
-  schedule:
-    - cron: '0 8 * * 1'
   push:
     # Publish `master` as Docker `latest` image, version tags as respective version too
     branches:
