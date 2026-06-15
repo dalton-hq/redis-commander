@@ -110,7 +110,7 @@ jobs:
           echo "Image tags:  ${{ steps.prep.outputs.tags }}"
 
       - name: Build local image for vulnerability scan
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           builder: ${{ steps.buildx.outputs.name }}
           context: .
@@ -123,7 +123,7 @@ jobs:
           docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:0.71.1 image --severity CRITICAL --ignore-unfixed --exit-code 1 "${{ steps.prep.outputs.scan_image }}"
 
       - name: Docker build and push to GHCR
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           builder: ${{ steps.buildx.outputs.name }}
           context: .
