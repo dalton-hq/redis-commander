@@ -1,4 +1,4 @@
-FROM alpine:3.24
+FROM alpine:3.24.4
 
 WORKDIR /redis-commander
 
@@ -18,7 +18,7 @@ COPY . .
 # for Openshift compatibility set project config dir itself group root and make it group writeable
 RUN  apk update \
   && apk upgrade \
-  && apk add --no-cache ca-certificates dumb-init sed jq moreutils nodejs=24.17.0-r0 c-ares=1.34.8-r0 npm yarn icu-libs icu-data-en \
+  && apk add --no-cache ca-certificates=20261020-r0 dumb-init=1.2.5-r4 sed=4.9-r2 jq=1.8.2-r0 moreutils=0.70-r1 nodejs-current=26.13.1-r0 c-ares=1.34.9-r0 npm=11.12.1-r0 yarn=1.22.22-r1 icu-libs=78.1-r0 icu-data-en=78.1-r0 \
   && update-ca-certificates \
   && echo -e "\n---- Create runtime user and fix file access rights ----------" \
   && adduser "${SERVICE_USER}" -h "${HOME}" -G root -S -u 10000 \
@@ -29,7 +29,11 @@ RUN  apk update \
   && echo -e "\n---- Check config file syntax --------------------------------" \
   && for i in "${HOME}"/config/*.json; do echo "checking config file $i"; cat "$i" | jq empty; ret=$?; if [ $ret -ne 0 ]; then exit $ret; fi; done \
   && echo -e "\n---- Installing app ------------------------------------------" \
-  && npm install --production -s \
+  && npm install --global npm@12.2.2 \
+  && npm ci --include=dev \
+  && npm run build \
+  && npm run sbom \
+  && npm prune --omit=dev \
   && echo -e "\n---- Cleanup and hardening -----------------------------------" \
   && "${HOME}/docker/harden.sh" \
   && rm -rf /tmp/* /root/.??* /root/cache /var/cache/apk/*
