@@ -8,7 +8,7 @@ This fork keeps the upstream MIT License and publishes Dalton-maintained contain
 
 See [NOTICE.md](./NOTICE.md) for attribution and license notes.
 
-The maintained runtime requires Node.js 26.13.1 or newer. The Docker build installs the locked dependencies, compiles the browser bundle, generates its production SBOM, and removes development packages. jQuery, Bootstrap, and Bootstrap Icons are served from their pinned npm packages.
+The maintained runtime uses Node.js 26.13.1. The Docker build installs the locked dependencies, compiles the browser bundle, generates its production SBOM, and removes development packages. jQuery, Bootstrap, and Bootstrap Icons are served from their pinned npm packages.
 
 ![GUI image](./docs/GUI_EXAMPLE.png)
 
