@@ -21,7 +21,8 @@
  *  http auth password from a secrets file too.
  */
 
-const yargs = require('yargs');
+// Create the CLI parser with the process argument strings.
+const yargs = require('yargs')(process.argv.slice(2));
 let bcrypt;
 try {
   bcrypt = require('bcrypt');
