@@ -1,6 +1,7 @@
-<div id="addKeyModal" class="modal hide fade">
+<div id="addKeyModal" class="modal fade">
+  <div class="modal-dialog modal-dialog-scrollable"><div class="modal-content">
   <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal">×</button>
+    <button type="button" class="btn-close" aria-label="Close" data-bs-dismiss="modal"></button>
     <h3>Add Key</h3>
   </div>
   <div class="modal-body">
@@ -8,13 +9,13 @@
       <div class="control-group">
         <label class="control-label" for="keyValue">Key</label>
         <div class="controls">
-          <input id="keyValue" type="text" value="" class="modal-content-width"/>
+          <input id="keyValue" type="text" value="" class="modal-content-width form-control"/>
         </div>
       </div>
       <div class="control-group">
         <label class="control-label" for="keyType">Type</label>
         <div class="controls">
-          <select id="keyType" name="keyType">
+          <select id="keyType" name="keyType" class="form-select">
             <option value="string">String</option>
             <option value="list">List</option>
             <option value="set">Set</option>
@@ -26,15 +27,15 @@
       </div>
       <span id="timestampWrap" class="control-group">
         <label class="control-label" for="keyTimestamp">Timestamp</label>
-        <input id="keyTimestamp" name="keyTimestamp" class="input-mini span2" type="text" value="*"/>
+        <input id="keyTimestamp" name="keyTimestamp" class="input-mini span2 form-control" type="text" value="*"/>
       </span>
       <span id="scoreWrap" class="control-group">
         <label class="control-label" for="keyScore">Score</label>
-        <input id="keyScore" name="keyScore" class="input-mini" type="text"/>
+        <input id="keyScore" name="keyScore" class="input-mini form-control" type="text"/>
       </span>
       <span id="fieldWrap" class="control-group">
         <label class="control-label" for="newFieldName">Field</label>
-        <input id="newFieldName" name="fieldName" class="modal-content-width" type="text"/>
+        <input id="newFieldName" name="fieldName" class="modal-content-width form-control" type="text"/>
       </span>
       <div class="control-group" style="display:inline;">
         <div class="controls">
@@ -42,20 +43,21 @@
       </div>
       <span id="fieldValueWrap" class="control-group">
         <label class="control-label" for="newFieldValue">Field</label>
-        <textarea id="newFieldValue" name="fieldValue" class="modal-content-width" style="height: 200px;"></textarea>
+        <textarea id="newFieldValue" name="fieldValue" class="modal-content-width form-control" style="height: 200px;"></textarea>
         <label class="checkbox"><input type="checkbox" id="addKeyFieldIsJson" name="isJson">Validate as JSON</label>
       </span>
       <label class="control-label" for="newStringValue">Value</label>
-      <textarea id="newStringValue" name="stringValue" class="modal-content-width" style="height: 200px;"></textarea>
+      <textarea id="newStringValue" name="stringValue" class="modal-content-width form-control" style="height: 200px;"></textarea>
       <label class="checkbox"><input type="checkbox" id="addKeyValueIsJson" name="isJson">Validate as JSON</label>
 
       <input id="addKeyConnectionId" type="hidden" value=""/>
     </form>
   </div>
   <div class="modal-footer">
-    <button class="btn" data-dismiss="modal">Close</button>
+    <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
     <button id="saveKeyButton" type="button" class="btn btn-primary" onclick="addNewKey()">Save</button>
   </div>
+  </div></div>
 </div>
 <script>
   setupJsonInputValidator('addKeyValueIsJson', 'newStringValue');
