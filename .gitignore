@@ -1,5 +1,7 @@
 /.idea
 /node_modules/
+/sbom.json
+/web/static/scripts/browserify.js
 *.rdb
 *.iml
 /config/local.json
