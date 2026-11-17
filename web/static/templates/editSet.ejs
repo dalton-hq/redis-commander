@@ -1,12 +1,12 @@
 <div id="itemActionsBar">
   <% if (!redisReadOnly) { %>
-  <button class="btn" data-toggle="modal" onclick="addSetMember('<%= connectionId %>','<%= key %>')"
+  <button class="btn btn-secondary" onclick="addSetMember('<%= connectionId %>','<%= key %>')"
           style="margin-right: 5px">Add New Member...
   </button>
   <button class="btn btn-danger" onclick="deleteKey('<%= connectionId %>','<%= key %>')">Delete Key</button>
   <% } %>
-  <button id="viewModeStringButton" class="btn" style="display:none;" onclick="dataUIFuncs.onModeStringButtonClick()">View mode string</button>
-  <button id="viewModeJsonButton" class="btn" onclick="dataUIFuncs.onModeJsonButtonClick()">View mode tree</button>
+  <button id="viewModeStringButton" class="btn btn-secondary" style="display:none;" onclick="dataUIFuncs.onModeStringButtonClick()">View mode string</button>
+  <button id="viewModeJsonButton" class="btn btn-secondary" onclick="dataUIFuncs.onModeJsonButtonClick()">View mode tree</button>
 </div>
 <div id="itemData">
   <label>Key: <b><%= key %></b></label>
