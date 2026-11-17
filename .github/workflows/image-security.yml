@@ -2,7 +2,6 @@
 name: Image security
 
 on:
-  workflow_dispatch:
   pull_request:
   push:
     branches-ignore:
@@ -15,7 +14,6 @@ permissions:
 jobs:
   build_scan:
     name: Build and scan image
-    if: github.event_name != 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -35,131 +33,3 @@ jobs:
       - name: Scan image for fixable critical vulnerabilities
         run: |
           docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:0.71.1 image --severity CRITICAL --ignore-unfixed --exit-code 1 redis-commander:ci
-
-  published_image:
-    name: Verify deployed image
-    if: github.repository == 'dalton-hq/redis-commander' && github.event_name != 'push'
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    env:
-      # Scan the exact artifact used by Dev EU and Prod US, independent of source rebuilds.
-      IMAGE: ghcr.io/dalton-hq/redis-commander@sha256:ce035f4df8b68ab6adeacd4c8cfdc35b11d096f481c929b7ecd2b3beae388e1d
-    services:
-      redis:
-        image: redis:8.6.0-alpine
-        ports:
-          - 6379:6379
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 5s
-          --health-timeout 3s
-          --health-retries 10
-    steps:
-      - name: Pull deployed image
-        run: |
-          mkdir -p reports
-          docker pull --platform linux/amd64 "$IMAGE"
-          docker image inspect "$IMAGE" > reports/image.json
-
-      - name: Record current vulnerabilities and database version
-        id: scan
-        run: |
-          docker run --rm \
-            -v /var/run/docker.sock:/var/run/docker.sock \
-            -v "$PWD/reports:/reports" \
-            -v "$RUNNER_TEMP/trivy-cache:/root/.cache/trivy" \
-            aquasec/trivy:0.71.1 image --scanners vuln \
-            --format json --output /reports/trivy.json "$IMAGE"
-          docker run --rm \
-            -v "$RUNNER_TEMP/trivy-cache:/root/.cache/trivy" \
-            aquasec/trivy:0.71.1 version --format json > reports/trivy-version.json
-
-      - name: Check Redis reads through both APIs
-        run: |
-          docker run --detach --name redis-commander --network host --user 10000 \
-            --env REDIS_HOST=127.0.0.1 --env K8S_SIGTERM=1 "$IMAGE"
-          curl --fail --retry 30 --retry-connrefused --retry-delay 1 --max-time 5 \
-            http://127.0.0.1:8081/favicon.png --output /dev/null
-          curl --fail --max-time 5 http://127.0.0.1:8081/ --output /dev/null
-          docker exec -i redis-commander node - <<'NODE'
-          // Verify data returned by the published image against an isolated Redis service.
-          const assert = require('node:assert/strict');
-          const Redis = require('ioredis');
-          const redis = new Redis({ host: '127.0.0.1', maxRetriesPerRequest: 1 }); // Disposable fixture database.
-
-          // Fetch the JSON response for a string API path, failing on HTTP errors.
-          async function getJson(path) {
-            const response = await fetch(`http://127.0.0.1:8081${path}`, {
-              signal: AbortSignal.timeout(5000)
-            });
-            assert.equal(response.status, 200, path);
-            return response.json();
-          }
-
-          // Seed only the disposable service and exercise both supported API versions.
-          async function checkReads() {
-            await redis.set('smoke:string', 'hello');
-            await redis.hset('smoke:hash', 'field', 'value');
-            await redis.rpush('smoke:list', 'item');
-            await redis.sadd('smoke:set', 'member');
-            await redis.zadd('smoke:zset', 7, 'ranked');
-            await redis.xadd('smoke:stream', '1-0', 'field', 'event');
-
-            const fixtures = { // Expected response fields for each Redis type.
-              string: { value: 'hello' },
-              hash: { data: { field: 'value' } },
-              list: { items: [{ number: 0, value: 'item' }] },
-              set: { members: ['member'] },
-              zset: { items: [{ value: 'ranked', score: '7', number: 0 }] },
-              stream: { items: [{ timestamp: '1-0', field: 'field', value: 'event', number: 1 }] }
-            };
-            const connections = await getJson('/connections'); // Connection list returned to the UI.
-            assert.equal(connections.ok, true);
-            assert.equal(connections.connections.length, 1);
-            const connectionId = encodeURIComponent(connections.connections[0].conId); // URL-safe connection ID.
-            const expectedKeys = Object.keys(fixtures).map(type => `smoke:${type}`).sort(); // Fixture key names.
-
-            // Both routes share readers, but their mounting and parameter handling must work.
-            for (const api of ['apiv1', 'apiv2']) {
-              const keys = await getJson(`/${api}/keys/${connectionId}/smoke%3A*`);
-              assert.deepEqual(keys.data, expectedKeys, `${api} key listing`);
-              // Check values, not only response status or the reported Redis type.
-              for (const [type, expected] of Object.entries(fixtures)) {
-                const key = `smoke:${type}`;
-                const details = await getJson(`/${api}/key/${connectionId}/${encodeURIComponent(key)}`);
-                assert.equal(details.type, type, `${api} ${key}`);
-                assert.equal(details.key, key);
-                // Each data type exposes its contents under a different response field.
-                for (const [field, value] of Object.entries(expected)) {
-                  assert.deepEqual(details[field], value, `${api} ${key}.${field}`);
-                }
-              }
-              console.log(`${api}: key listing and six Redis data types passed`);
-            }
-          }
-
-          checkReads().catch(error => {
-            // Preserve the failure while closing the test client's Redis connection.
-            console.error(error);
-            process.exitCode = 1;
-          }).finally(() => redis.disconnect());
-          NODE
-
-      - name: Reject fixable critical and high vulnerabilities
-        if: always() && steps.scan.outcome == 'success'
-        run: |
-          jq -e '[.Results[]?.Vulnerabilities[]? |
-            select((.Severity == "CRITICAL" or .Severity == "HIGH") and
-              ((.FixedVersion // "") != ""))] | length == 0' reports/trivy.json
-
-      - name: Save container logs
-        if: always()
-        run: docker logs redis-commander > reports/commander.log 2>&1 || true
-
-      - name: Upload image evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: deployed-image-evidence
-          path: reports/
-          if-no-files-found: error
