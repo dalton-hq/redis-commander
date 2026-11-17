@@ -1,4 +1,5 @@
-<div id="signinModal" class="modal hide fade" data-backdrop="static" data-keyboard="false">
+<div id="signinModal" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-dialog-scrollable"><div class="modal-content">
   <div class="modal-header">
     <h3>Sign In</h3>
   </div>
@@ -14,14 +15,15 @@
       </div>
   </div>
   <div class="modal-footer">
-    <button id="signinButton" type="submit" class="btn btn-primary" data-loading-text="<i class='icon-refresh'></i> Signing-In...">Sign In</button>
+    <button id="signinButton" type="submit" class="btn btn-primary" data-loading-text="<i class='bi bi-arrow-clockwise'></i> Signing-In...">Sign In</button>
   </div>
   </form>
+  </div></div>
 </div>
 
 <script type="text/javascript">
 $(function() {
-  $('#signinModal').on('shown', function(event) {
+  $('#signinModal').on('shown.bs.modal', function(event) {
     $(event.target).find('#signinUsername').trigger('focus');
   });
 

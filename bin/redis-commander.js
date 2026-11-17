@@ -2,7 +2,8 @@
 
 'use strict';
 
-const yargs = require('yargs');
+// Create the CLI parser with the process argument strings.
+const yargs = require('yargs')(process.argv.slice(2));
 const Redis = require('ioredis');
 const isEqual = require('lodash.isequal');
 const myUtils = require('../lib/util');
@@ -14,6 +15,8 @@ process.chdir( path.join(__dirname, '..') );
 
 process.env.ALLOW_CONFIG_MUTATIONS = true;
 const config = require('config');
+// Static helpers for merging deprecated configuration fields.
+const { Util: ConfigUtil } = require('config/lib/util.js');
 
 const connectionWrapper = require('../lib/connections');
 let redisConnections;
@@ -385,7 +388,7 @@ if (startServer) {
 
     myUtils.getDeprecatedConfig(function(err, oldConfig) {
       // old config only contains some ui parameters or connection definitions
-      config.ui = config.util.extendDeep(config.ui, oldConfig.ui);
+      config.ui = ConfigUtil.extendDeep(config.ui, oldConfig.ui);
       if (Array.isArray(oldConfig.connections) && oldConfig.connections.length > 0) {
         oldConfig.connections.forEach(function(cfg) {
           if (!connectionWrapper.containsConnection(config.connections, cfg)) {

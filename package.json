@@ -24,62 +24,54 @@
   "main": "lib/app.js",
   "dependencies": {
     "async": "3.2.6",
-    "bcryptjs": "2.4.3",
-    "body-parser": "1.20.6",
+    "bcryptjs": "3.0.3",
+    "body-parser": "2.4.0",
+    "bootstrap": "5.3.9",
+    "bootstrap-icons": "1.13.2",
     "clipboard": "2.0.11",
     "cmdparser": "0.1.0",
-    "config": "3.3.12",
-    "dateformat": "3.0.3",
-    "ejs": "3.1.10",
-    "express": "4.22.2",
+    "config": "5.0.1",
+    "dateformat": "5.0.5",
+    "ejs": "7.0.2",
+    "express": "5.3.0",
     "express-partials": "0.3.0",
-    "inflection": "1.13.4",
-    "ioredis": "5.11.1",
+    "inflection": "3.0.2",
+    "ioredis": "6.0.0",
+    "jquery": "4.0.0",
     "jquery.json-viewer": "1.5.0",
     "jsonwebtoken": "9.0.3",
     "jstree": "3.3.17",
     "lodash.isequal": "4.5.0",
-    "lossless-json": "1.0.5",
+    "lossless-json": "4.3.3",
     "node-redis-dump2": "0.6.0",
     "opener": "1.5.2",
     "readline-browserify": "0.0.4",
-    "yargs": "17.7.2"
+    "yargs": "18.2.0"
   },
   "optionalDependencies": {
     "bcrypt": "6.0.0"
   },
   "overrides": {
-    "brace-expansion": "5.0.8",
-    "express": {
-      "path-to-regexp": "0.1.13"
-    },
-    "filelist": {
-      "minimatch": {
-        ".": "5.1.8",
-        "brace-expansion": "5.0.8"
-      }
-    },
-    "jake": {
-      "minimatch": {
-        ".": "3.1.4",
-        "brace-expansion": "5.0.8"
-      }
+    "brace-expansion": "5.0.13",
+    "jstree": {
+      "jquery": "4.0.0"
     },
     "node-redis-dump2": {
+      "ioredis": "6.0.0",
       "underscore": "1.13.8"
     }
   },
   "devDependencies": {
-    "@cyclonedx/bom": "4.1.6",
+    "@cyclonedx/cyclonedx-npm": "7.0.1",
     "browserify": "17.0.1",
-    "chai": "5.3.3",
-    "mocha": "11.7.6",
+    "chai": "6.3.0",
+    "mocha": "12.0.3",
     "mocha-junit-reporter": "2.2.1",
-    "nyc": "17.1.0",
+    "nyc": "18.0.0",
     "uglify-js": "3.19.3"
   },
   "engines": {
-    "node": ">=12.0"
+    "node": "26.13.1"
   },
   "bin": {
     "redis-commander": "./bin/redis-commander.js"
@@ -95,7 +87,7 @@
     "helm-lint": "docker run -it --workdir=/data --volume \"$(pwd)/k8s/helm-chart/redis-commander:/data\" quay.io/helmpack/chart-testing ct lint --charts . --validate-maintainers=false",
     "test": "mocha",
     "test-with-lcov": "nyc --reporter=lcov --report-dir ./docs/coverage/nodejs mocha --timeout 10000 --reporter mocha-junit-reporter --reporter-options mochaFile=./docs/coverage/junit.xml --exit",
-    "sbom": "cyclonedx-npm --omit optional --mc-type application --output-format json --output-file ./sbom.json"
+    "sbom": "cyclonedx-npm --omit dev --mc-type application --output-reproducible --output-format json --output-file ./sbom.json"
   },
   "snyk": true
 }

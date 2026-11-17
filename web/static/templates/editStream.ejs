@@ -1,13 +1,13 @@
 <div id="itemActionsBar">
   <% if (!redisReadOnly) { %>
-  <button class="btn" data-toggle="modal" onclick="addXSetMember('<%= connectionId %>','<%= key %>')"
+  <button class="btn btn-secondary" onclick="addXSetMember('<%= connectionId %>','<%= key %>')"
           style="margin-right: 5px">Add New Entry...
   </button>
   <button class="btn btn-danger" onclick="deleteKey('<%= connectionId %>','<%= key %>')">Delete Key</button>
   <% } %>
   <div id="pageNav" class="input-append input-prepend">
     <% if (length > 0) { %>
-    <input class="span2" id="timestampIndex" type="text" value="<%= items.length > 0 ? items[0].timestamp : 1 %>"/>
+    <input class="span2 form-control" id="timestampIndex" type="text" value="<%= items.length > 0 ? items[0].timestamp : 1 %>"/>
     <button id="gotoTimestampButton" class="btn btn-primary" type="button"
             onclick="loadKey('<%= connectionId %>','<%= key%>', $('#timestampIndex').val())">Goto Timestamp
     </button>
@@ -37,8 +37,8 @@
       <td><%= item.value %></td>
       <td>
         <% if (!redisReadOnly) { %>
-        <button class="btn btn-mini btn-remove">
-        <b class="icon-remove-circle"></b>
+        <button class="btn btn-sm btn-remove">
+        <b class="bi bi-x-circle"></b>
         </button>
         <% } %>
       </td>
