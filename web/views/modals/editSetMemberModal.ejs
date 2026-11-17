@@ -1,24 +1,26 @@
-<div id="editSetMemberModal" class="modal hide fade">
+<div id="editSetMemberModal" class="modal fade">
+  <div class="modal-dialog modal-dialog-scrollable"><div class="modal-content">
   <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal">×</button>
+    <button type="button" class="btn-close" aria-label="Close" data-bs-dismiss="modal"></button>
     <h3>Edit Set Member</h3>
   </div>
   <div class="modal-body">
     <form id="editSetMemberForm" action="apiv2/set/member/edit" method="POST" class="form-vertical">
       <input id="setKey" name="key" type="hidden"/>
       <label class="control-label" for="setOldMember">Member</label>
-      <input id="setOldMember" name="oldValue" type="text" class="modal-content-width" readonly/>
+      <input id="setOldMember" name="oldValue" type="text" class="modal-content-width form-control" readonly/>
       <label class="control-label" for="setMember">Updated Member</label>
-      <textarea id="setMember" name="value" class="modal-content-width" style="height: 150px;"></textarea>
+      <textarea id="setMember" name="value" class="modal-content-width form-control" style="height: 150px;"></textarea>
       <label class="checkbox"><input type="checkbox" id="setMemberIsJson" name="isJson">Validate as JSON</label>
       <input id="setConnectionId" name="connectionId" type="hidden"/>
     </form>
   </div>
   <div class="modal-footer">
-    <button class="btn" data-dismiss="modal">Close</button>
-    <button id="removeSetMemberButton" class="btn btn-danger" data-loading-text="<i class='icon-refresh'></i> Removing..." onclick="removeSetElement()">Remove Member</button>
-    <button id="editSetMemberButton" class="btn btn-primary" data-loading-text="<i class='icon-refresh'></i> Saving..." onclick="$('#editSetMemberForm').trigger('submit')">Save</button>
+    <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+    <button id="removeSetMemberButton" class="btn btn-danger" data-loading-text="<i class='bi bi-arrow-clockwise'></i> Removing..." onclick="removeSetElement()">Remove Member</button>
+    <button id="editSetMemberButton" class="btn btn-primary" data-loading-text="<i class='bi bi-arrow-clockwise'></i> Saving..." onclick="$('#editSetMemberForm').trigger('submit')">Save</button>
   </div>
+  </div></div>
 </div>
 <script>
   setupEditDataModals('editSetMemberForm', 'editSetMemberButton');
