@@ -1684,9 +1684,8 @@ function resizeApp () {
   var body = $('#body');
   var keyTree = $('#keyTree');
   var sideBar =  $('#sideBar');
-  var barWidth = keyTree.outerWidth(true);
+  var barWidth = sideBar.outerWidth();
   var newBodyWidth = $(window).width() - barWidth - parseInt(body.css('margin-left'), 10);
-  sideBar.css('width', barWidth + "px");
   keyTree.height($(window).height() - keyTree.offset().top - $('#commandLineContainer').outerHeight(true));
   body.css({'width': newBodyWidth + "px", 'left': barWidth + "px", 'height': sideBar.css('height')});
   $('#itemData').css('margin-top', $('#itemActionsBar').outerHeight(false));
