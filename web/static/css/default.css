@@ -242,6 +242,11 @@ body {
 
 #redisCommandsModal {
   overflow: hidden;
+  pointer-events: none;
+}
+
+#redisCommandsModal .modal-dialog {
+  pointer-events: auto;
 }
 
 #redisCommandsModal .modal-body {
