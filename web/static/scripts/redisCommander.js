@@ -30,39 +30,39 @@ const connections = {
 
 const  fullMenu = {
   'renameKey': {
-    icon: './images/icon-edit.png',
+    icon: 'bi bi-pencil-square',
     label: 'Rename Key',
     action: renameKey
   },
   'addKey': {
-    icon: './images/icon-plus.png',
+    icon: 'bi bi-plus',
     label: 'Add Key',
     action: addKey
   },
   'custerNodes': {
-    icon: './images/icon-info.png',
+    icon: 'bi bi-info-circle',
     label: 'Cluster Nodes',
     action: clusterNodes
   },
   'refresh': {
-    icon: './images/icon-refresh.png',
+    icon: 'bi bi-arrow-clockwise',
     label: 'Refresh',
     action: function (obj) {
       jQuery.jstree.reference('#keyTree').refresh(obj);
     }
   },
   'export': {
-    icon: './images/icon-download.png',
+    icon: 'bi bi-download',
     label: 'Export Keys',
     action: exportKey
   },
   'remKey': {
-    icon: './images/icon-trash.png',
+    icon: 'bi bi-trash',
     label: 'Remove Key',
     action: deleteKey
   },
   'remConnection': {
-    icon: './images/icon-trash.png',
+    icon: 'bi bi-trash',
     label: 'Disconnect',
     action: removeServer
   }
@@ -196,7 +196,7 @@ function loadTree () {
               plugins: [ 'themes', 'contextmenu' ]
           })
           .on('select_node.jstree', treeNodeSelected)
-          .delegate('a', 'click', function (event, data2) {
+          .on('click', 'a', function (event, data2) {
             event.preventDefault();
           })
           .on('keyup', function (e) {
@@ -369,13 +369,16 @@ function selectTreeNodeBranch (data) {
   renderEjs('templates/editBranch.ejs', data, $('#body'));
 }
 
+/** Wire the form ID and save-button ID to a Redis edit request. */
 function setupEditDataModals(idForm, idSaveBtn) {
   $('#' + idForm).off('submit').on('submit', function(event) {
     console.log('saving');
     event.preventDefault();
     var editForm = $(event.target);
     var editModal = editForm.closest('.modal');
-    editModal.find('#' + idSaveBtn).button('loading');
+    var saveButton = editModal.find('#' + idSaveBtn); // Save control with its idle label.
+    var idleLabel = saveButton.html(); // Original button HTML restored after the request.
+    saveButton.prop('disabled', true).html(saveButton.attr('data-loading-text'));
 
     $.post(editForm.attr('action'), editForm.serialize()
     ).done(function (data, status) {
@@ -389,7 +392,7 @@ function setupEditDataModals(idForm, idSaveBtn) {
       setTimeout(function () {
         refreshTree();
         getKeyTree().select_node(0);
-        editModal.find('#' + idSaveBtn).button('reset');
+        saveButton.prop('disabled', false).html(idleLabel);
         editModal.modal('hide');
       }, 500);
     });
@@ -402,7 +405,7 @@ function setupJsonInputValidator(idJsonCheckbox, idInput) {
     if (element.target.checked) addInputValidator(idInput, 'json');
     else removeInputValidator(idInput);
   });
-  chkBox.closest('.modal').on('hidden', function() {
+  chkBox.closest('.modal').on('hidden.bs.modal', function() {
     removeInputValidator(idInput);
     chkBox.prop('checked', false);
   })
@@ -410,7 +413,7 @@ function setupJsonInputValidator(idJsonCheckbox, idInput) {
 
 function registerModalFocus(idModal, idInput) {
   var modal = $('#' + idModal);
-  modal.on('shown', function () {
+  modal.on('shown.bs.modal', function () {
     modal.find('#' + idInput).trigger('focus')
   });
 }
@@ -422,7 +425,7 @@ function setupAddServerForm() {
   $('#addServerForm').off('submit').on('submit', function (event) {
     console.log('try connection to new redis server');
     event.preventDefault();
-    $('#addServerBtn').prop('disabled', true).html('<i class="icon-refresh"></i> Saving');
+    $('#addServerBtn').prop('disabled', true).html('<i class="bi bi-arrow-clockwise"></i> Saving');
     var form = $(event.target);
     $.post(form.attr('action'), form.serialize())
         .done(function () {
@@ -578,7 +581,7 @@ function addNewKey() {
   var connectionId = newKeyModal.find('#addKeyConnectionId').val();
   var action = 'apiv2/key/' + encodeURIComponent(connectionId) + '/' + encodeURIComponent(newKey);
   console.log('saving new key ' + newKey);
-  newKeyModal.find('#saveKeyButton').attr('disabled', 'disabled').html('<i class="icon-refresh"></i> Saving');
+  newKeyModal.find('#saveKeyButton').attr('disabled', 'disabled').html('<i class="bi bi-arrow-clockwise"></i> Saving');
 
   $.ajax({
     url: action,
@@ -606,7 +609,7 @@ function renameExistingKey() {
   var connectionId = modal.find('#renameKeyConnectionId').val();
   var action = 'apiv2/key/' + encodeURIComponent(connectionId) + '/' + encodeURIComponent(oldKey);
   console.log('renaming ' + oldKey + ' to new key ' + newKey);
-  modal.find('#renameKeyButton').attr('disabled', 'disabled').html('<i class="icon-refresh"></i> Saving');
+  modal.find('#renameKeyButton').attr('disabled', 'disabled').html('<i class="bi bi-arrow-clockwise"></i> Saving');
 
   $.ajax({
     url: action,
@@ -662,7 +665,7 @@ function selectTreeNodeString (data) {
         console.log('saving');
         event.preventDefault();
         var editForm = $(event.target);
-        $('#saveKeyButton').attr('disabled', 'disabled').html('<i class="icon-refresh"></i> Saving');
+        $('#saveKeyButton').attr('disabled', 'disabled').html('<i class="bi bi-arrow-clockwise"></i> Saving');
 
         $.post(editForm.attr('action'), editForm.serialize()
         ).done(function(data2, status) {
@@ -767,7 +770,7 @@ function selectTreeNodeReJSON(data) {
         console.log('saving');
         event.preventDefault();
         var editForm = $(event.target);
-        $('#saveKeyButton').attr('disabled', 'disabled').html('<i class="icon-refresh"></i> Saving');
+        $('#saveKeyButton').attr('disabled', 'disabled').html('<i class="bi bi-arrow-clockwise"></i> Saving');
 
         $.post(editForm.attr('action'), editForm.serialize()
         ).done(function(data2, status) {
@@ -1582,7 +1585,7 @@ function detectServerDB() {
   }).fail(function (jqXHR) {
     alert('Error fetching list of used databases from this host.');
     clearAddServerForm();
-    serverForm.parent('.modal').modal('hide');
+    serverForm.closest('.modal').modal('hide');
   });
 }
 
@@ -1691,13 +1694,15 @@ function resizeApp () {
   cli.find('#_readline_input').width( cli.innerWidth() - cli.find('.prompt').outerWidth() -20 )
 }
 
+/** Connect window and element size changes to the application layout. */
 function setupResizeEvents () {
   var sidebarResizing = false;
   var sidebarFrame = $('#sideBar').width();
   var commandResizing = false;
   var commandFrame = $('#commandLineOutput').height();
 
-  $('#keyTree').on('resize', resizeApp);
+  // Observe element dimensions without the jQuery resize plugin.
+  new ResizeObserver(resizeApp).observe(document.getElementById('keyTree'));
   $(window).on('resize', resizeApp);
 
   $(document).on('mouseup', function (event) {
@@ -1729,10 +1734,11 @@ function setupResizeEvents () {
   });
 }
 
+/** Toggle the Redis command reference dialog. */
 function toggleRedisModal() {
   var redisModal = $('#redisCommandsModal');
-  // change 'modal' to 'bs.modal' for bootstrap >=3, isShown to _isShown for bootstrap 4
-  if ((redisModal.data('modal') || {}).isShown) {
+  // The visible state is exposed on the modal element.
+  if (redisModal.hasClass('show')) {
       redisModal.modal('hide');
   }
   else {
