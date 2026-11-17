@@ -2,7 +2,8 @@
 
 'use strict';
 
-const yargs = require('yargs');
+// Create the CLI parser with the process argument strings.
+const yargs = require('yargs')(process.argv.slice(2));
 const Redis = require('ioredis');
 const isEqual = require('lodash.isequal');
 const myUtils = require('../lib/util');
