@@ -1,22 +1,22 @@
 <div id="app-container">
   <div id="sideBar">
     <div id="keyTreeActions">
-      <button class="btn btn-success btn-mini" onclick="refreshTree()"><b class="icon-refresh icon-white"></b> Refresh</button>
-      <button class="btn btn-mini" onclick="toggleRedisModal()"><b class="icon-info-sign"></b> Commands</button>
+      <button class="btn btn-success btn-sm" onclick="refreshTree()"><b class="bi bi-arrow-clockwise"></b> Refresh</button>
+      <button class="btn btn-sm" onclick="toggleRedisModal()"><b class="bi bi-info-circle"></b> Commands</button>
       <div class="btn-group">
-        <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">
-          <b class="icon-wrench"></b>
+        <a class="btn btn-sm dropdown-toggle" data-bs-toggle="dropdown" href="#">
+          <b class="bi bi-wrench"></b>
           More...
           <span class="caret"></span>
         </a>
         <ul class="dropdown-menu">
-          <li><a data-toggle="modal" id="refreshNodes" href="#"><b class="icon-refresh"></b><b class="icon-empty"></b> Refresh All Nodes</a></li>
-          <li><a data-toggle="modal" id="expandAllNodes" href="#"><b class="icon-refresh"></b><b class="icon-fullscreen"></b> Refresh + Expand All Nodes</a></li>
+          <li><a class="dropdown-item" id="refreshNodes" href="#"><b class="bi bi-arrow-clockwise"></b><b class="icon-empty"></b> Refresh All Nodes</a></li>
+          <li><a class="dropdown-item" id="expandAllNodes" href="#"><b class="bi bi-arrow-clockwise"></b><b class="bi bi-arrows-fullscreen"></b> Refresh + Expand All Nodes</a></li>
           <% if (!redisReadOnly) { %>
-          <li><a data-toggle="modal" id="redisImportData" href="#"><b class="icon-arrow-right"></b><b class="icon-th"></b> Import</a></li>
+          <li><a class="dropdown-item" id="redisImportData" href="#"><b class="bi bi-arrow-right"></b><b class="bi bi-grid-3x3-gap"></b> Import</a></li>
           <% } %>
-          <li><a data-toggle="modal" id="redisExportData" href="#"><b class="icon-arrow-left"></b><b class="icon-th"></b> Export</a></li>
-          <li><a data-toggle="modal" href="#addServerModal"><b class="icon-plus-sign"></b><b class="icon-empty"></b> Add Server</a></li>
+          <li><a class="dropdown-item" id="redisExportData" href="#"><b class="bi bi-arrow-left"></b><b class="bi bi-grid-3x3-gap"></b> Export</a></li>
+          <li><a class="dropdown-item" data-bs-toggle="modal" href="#addServerModal"><b class="bi bi-plus-circle"></b><b class="icon-empty"></b> Add Server</a></li>
         </ul>
       </div>
     </div>
@@ -29,10 +29,10 @@
 </div>
 <div id="commandLineContainer">
   <div id="commandLineBorder" style="border-top: 1px solid #ddd;padding-bottom: 5px;"></div>
-  <div class="btn-group" data-toggle="buttons-radio" style="padding-bottom: 5px; padding-left: 5px" id="connectionsBar">
+  <div class="btn-group" style="padding-bottom: 5px; padding-left: 5px" id="connectionsBar">
   </div>
   <div style="border-top: 1px solid #ddd;padding-bottom: 5px;"></div>
-  <i id="lockCommandButton" class="icon-lock disabled"></i>
+  <i id="lockCommandButton" class="bi bi-lock disabled"></i>
 
   <div id="commandLineOutput"></div>
   <label id="selectedConnectionLabel">Current Server:</label>
@@ -42,29 +42,32 @@
 </div>
 
 <!-- COMMANDS AND CONNECTION MODALS -->
-<div id="redisCommandsModal" class="modal hide fade">
-  <span class="modal-head">
+<div id="redisCommandsModal" class="modal fade">
+  <div class="modal-dialog modal-dialog-scrollable"><div class="modal-content">
+  <span class="modal-header bg-dark text-white">
     <a id="redisCommandsExternal" target="_blank" href="">Open in new window</a> &nbsp; | &nbsp;
-    <button id="redisCommandsClose" type="button" class="close" data-dismiss="modal">Close</button>
+    <button id="redisCommandsClose" type="button" class="btn-close btn-close-white" aria-label="Close" data-bs-dismiss="modal"></button>
   </span>
   <div class="modal-body">
     <iframe id="redisCommandsModalSrc" seamless="seamless" src="">test</iframe>
   </div>
+  </div></div>
 </div>
 
-<div id="addServerModal" class="modal hide fade">
+<div id="addServerModal" class="modal fade">
+  <div class="modal-dialog modal-dialog-scrollable"><div class="modal-content">
   <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal">×</button>
+    <button type="button" class="btn-close" aria-label="Close" data-bs-dismiss="modal"></button>
     <h3>Add a connection</h3>
   </div>
   <div class="modal-body" id="addServerContainer">
     <form action="login" method="POST" id="addServerForm" class="form-vertical">
       <label for="label">Display-Name</label>
-      <input type="text" name="label" id="label" value="" class="span6" required>
+      <input type="text" name="label" id="label" value="" class="span6 form-control" required>
       <div class="control-group">
         <label class="control-label" for="serverType">Server Type</label>
         <div class="controls">
-          <select id="serverType" name="serverType">
+          <select id="serverType" name="serverType" class="form-select">
             <option value="redis">Standalone Redis-Server</option>
             <option value="sentinel">Sentinel</option>
             <option value="cluster">Cluster</option>
@@ -73,15 +76,15 @@
       </div>
       <div id="addServerGroupRedis">
         <label for="hostname">Hostname or Unix Socket Path</label>
-        <input type="text" name="hostname" id="hostname" value="localhost" class="span6" required>
+        <input type="text" name="hostname" id="hostname" value="localhost" class="span6 form-control" required>
         <label for="port">Port</label>
-        <input type="number" name="port" id="port" value="6379">
+        <input type="number" name="port" id="port" value="6379" class="form-control">
       </div>
       <div id="addServerGroupSentinel">
         <label for="sentinelName">Sentinel Group Name</label>
-        <input type="text" name="sentinelName" id="sentinelName" value="<%= sentinelDefaultGroupName %>" class="span6" required>
+        <input type="text" name="sentinelName" id="sentinelName" value="<%= sentinelDefaultGroupName %>" class="span6 form-control" required>
         <label for="sentinels">List of sentinels</label>
-        <input type="text" name="sentinels" id="sentinels" value="localhost:26379" class="span6" required>
+        <input type="text" name="sentinels" id="sentinels" value="localhost:26379" class="span6 form-control" required>
         <div>Add comma-separated list of sentinels with "host-1:port,host-2 ..."</div>
         <br>
         <label class="radio inline">
@@ -97,43 +100,43 @@
           Explicit Sentinel password
         </label>
         <label for="sentinelPassword" class="muted">Password for Sentinels</label>
-        <input type="password" name="sentinelPassword" id="sentinelPassword" value="" class="span6" disabled>
+        <input type="password" name="sentinelPassword" id="sentinelPassword" value="" class="span6 form-control" disabled>
         <label>Use Sentinel TLS?</label>
         <label class="radio inline"><input type="radio" name="sentinelTLS" value="no" checked="checked">No</label>
         <label class="radio inline"><input type="radio" name="sentinelTLS" value="yes">Yes</label>
         <label class="radio inline"><input type="radio" name="sentinelTLS" value="custom">Custom</label>
         <label for="sentinelTLSCA" class="muted">SSL CA Certificate</label>
-        <input type="text" name="sentinelTLSCA" id="sentinelTLSCA" value="" class="span6" placeholder="replace newline characters with literal '\n'" disabled>
+        <input type="text" name="sentinelTLSCA" id="sentinelTLSCA" value="" class="span6 form-control" placeholder="replace newline characters with literal '\n'" disabled>
         <label for="sentinelTLSPublicKey" class="muted">SSL Certificate/Public Key</label>
-        <input type="text" name="sentinelTLSPublicKey" id="sentinelTLSPublicKey" value="" class="span6" placeholder="replace newline characters with literal '\n'" disabled>
+        <input type="text" name="sentinelTLSPublicKey" id="sentinelTLSPublicKey" value="" class="span6 form-control" placeholder="replace newline characters with literal '\n'" disabled>
         <label for="sentinelTLSPrivateKey" class="muted">SSL Private Key</label>
-        <input type="text" name="sentinelTLSPrivateKey" id="sentinelTLSPrivateKey" value="" class="span6" placeholder="replace newline characters with literal '\n'" disabled>
+        <input type="text" name="sentinelTLSPrivateKey" id="sentinelTLSPrivateKey" value="" class="span6 form-control" placeholder="replace newline characters with literal '\n'" disabled>
         <label for="sentinelTLSServerName" class="muted">Server Name <small>It is the name of the host being connected to, and must be a host name, and not an IP address.</small></label>
-        <input type="text" name="sentinelTLSServerName" id="sentinelTLSServerName" value="" class="span6" disabled>
+        <input type="text" name="sentinelTLSServerName" id="sentinelTLSServerName" value="" class="span6 form-control" disabled>
         <hr style="margin-right: 24px">
       </div>
       <div id="addServerGroupCluster">
         <label for="sentinels">List of cluster nodes</label>
-        <input type="text" name="clusters" id="clusters" value="localhost:6379" class="span6" required>
+        <input type="text" name="clusters" id="clusters" value="localhost:6379" class="span6 form-control" required>
         <div>Add comma-separated list of nodes with "host-1:port,host-2 ..."</div>
         <br>
       </div>
       <label for="password">Redis Server Password</label>
-      <input type="password" name="password" id="password" value="" class="span6">
+      <input type="password" name="password" id="password" value="" class="span6 form-control">
       <label for="dbIndex">Database Index</label>
-      <input type="number" name="dbIndex" id="dbIndex" value="0" required>
+      <input type="number" name="dbIndex" id="dbIndex" value="0" required class="form-control">
       <label>Use TLS?</label>
       <label class="radio inline"><input type="radio" name="redisTLS" value="no" checked>No</label>
       <label class="radio inline"><input type="radio" name="redisTLS" value="yes">Yes</label>
       <label class="radio inline"><input type="radio" name="redisTLS" value="custom">Custom</label>
       <label for="redisTLSCA" class="muted">SSL CA Certificate</label>
-      <input type="text" name="redisTLSCA" id="redisTLSCA" value="" class="span6" placeholder="replace newline characters with literal '\n'" disabled>
+      <input type="text" name="redisTLSCA" id="redisTLSCA" value="" class="span6 form-control" placeholder="replace newline characters with literal '\n'" disabled>
       <label for="redisTLSPublicKey" class="muted">SSL Certificate</label>
-      <input type="text" name="redisTLSPublicKey" id="redisTLSPublicKey" value="" class="span6" placeholder="replace newline characters with literal '\n'" disabled>
+      <input type="text" name="redisTLSPublicKey" id="redisTLSPublicKey" value="" class="span6 form-control" placeholder="replace newline characters with literal '\n'" disabled>
       <label for="redisTLSPrivateKey" class="muted">SSL Private Key</label>
-      <input type="text" name="redisTLSPrivateKey" id="redisTLSPrivateKey" value="" class="span6" placeholder="replace newline characters with literal '\n'" disabled>
+      <input type="text" name="redisTLSPrivateKey" id="redisTLSPrivateKey" value="" class="span6 form-control" placeholder="replace newline characters with literal '\n'" disabled>
       <label for="redisTLSServerName" class="muted">Server Name</label>
-      <input type="text" name="redisTLSServerName" id="redisTLSServerName" value="" class="span6" disabled>
+      <input type="text" name="redisTLSServerName" id="redisTLSServerName" value="" class="span6 form-control" disabled>
       <label for="clusterNoTlsValidation" class="muted">
         <input type="checkbox" name="clusterNoTlsValidation" id="clusterNoTlsValidation" value="" style="vertical-align: top" disabled>
         Disable TLS Validation for Cluster Nodes (AWS Certificate Workaround)
@@ -141,36 +144,41 @@
     </form>
   </div>
   <div class="modal-footer">
-    <a href="#" class="btn" data-dismiss="modal">Close</a>
-    <a type="button" onclick="detectServerDB()" class="btn" id="detectServerBtn">Find Used DB</a>
+    <a href="#" class="btn btn-secondary" data-bs-dismiss="modal">Close</a>
+    <a type="button" onclick="detectServerDB()" class="btn btn-secondary" id="detectServerBtn">Find Used DB</a>
     <a type="button" onclick="addServer()" class="btn btn-primary" id="addServerBtn">Connect...</a>
   </div>
+  </div></div>
 </div>
 
-<div id="selectServerDbModal" class="modal hide fade">
+<div id="selectServerDbModal" class="modal fade">
+  <div class="modal-dialog modal-dialog-scrollable"><div class="modal-content">
   <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal">×</button>
+    <button type="button" class="btn-close" aria-label="Close" data-bs-dismiss="modal"></button>
     <h3>Select databases to connect</h3>
   </div>
   <div class="modal-body" id="selectServerDbContainer">
   </div>
   <div class="modal-footer">
-    <a href="#" class="btn" data-dismiss="modal" onclick="clearAddServerForm()">Close</a>
+    <a href="#" class="btn btn-secondary" data-bs-dismiss="modal" onclick="clearAddServerForm()">Close</a>
     <a type="button" onclick="selectNewServerDbs()" class="btn btn-primary" id="selectServerDbBtn">Connect...</a>
   </div>
+  </div></div>
 </div>
 
-<div id="clusterNodesModal" class="modal hide fade">
+<div id="clusterNodesModal" class="modal fade">
+  <div class="modal-dialog modal-dialog-scrollable"><div class="modal-content">
   <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal">×</button>
+    <button type="button" class="btn-close" aria-label="Close" data-bs-dismiss="modal"></button>
     <h3>Cluster Node Information</h3>
   </div>
   <div class="modal-body">
     <table id="clusterNodesTab"></table>
   </div>
   <div class="modal-footer">
-    <a href="#" class="btn" data-dismiss="modal" onclick="$('#clusterNodesModal').modal('hide')">Close</a>
+    <a href="#" class="btn btn-secondary" data-bs-dismiss="modal" onclick="$('#clusterNodesModal').modal('hide')">Close</a>
   </div>
+  </div></div>
 </div>
 
 <!-- /COMMANDS MODAL -->
@@ -182,6 +190,8 @@
   const httpAuthHeaderName = '<%= httpAuthHeaderName %>';
 
   const setConnection = function (connectionBtn) {
+    $('#connectionsBar .btn').removeClass('active');
+    $(connectionBtn).addClass('active');
     $('#selectedConnectionLabel').text('Current Instance: "' + connectionBtn.dataset.label +
             '" (' + connectionBtn.dataset.visibleid + ')');
     $('#selectedConnection').val(connectionBtn.value);
@@ -210,9 +220,8 @@
           sessionStorage.removeItem('redisCommanderQueryToken');
           $('#signinModal').modal({
             backdrop: 'static',
-            keyboard: false,
-            show: true
-          });
+            keyboard: false
+          }).modal('show');
           return;
         }
         var oldToken = sessionStorage.getItem('redisCommanderBearerToken');
@@ -255,8 +264,7 @@
         });
         $('#redisCommandsModal').modal({
           backdrop: false,
-          keyboard: false,
-          show: false
+          keyboard: false
         });
       });
       redisCli.loadCommandLine();
