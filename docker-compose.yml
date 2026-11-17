@@ -3,12 +3,12 @@ services:
   redis:
     container_name: redis
     hostname: redis
-    image: redis
+    image: redis:8.10.3-alpine
 
   redis-commander:
     container_name: redis-commander
     hostname: redis-commander
-    image: ghcr.io/joeferner/redis-commander:latest
+    image: ghcr.io/dalton-hq/redis-commander:latest
     build: .
     restart: always
     environment:
